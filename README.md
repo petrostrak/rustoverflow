@@ -1,4 +1,4 @@
-## Stackoverflow
+## RustOverflow
 An API for a StackOverflow-like app.
 
 Two primary features in StackOverflow will be implemented:
