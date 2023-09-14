@@ -1,3 +1,4 @@
+mod handlers;
 mod models;
 
 fn main() {
