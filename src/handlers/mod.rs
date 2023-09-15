@@ -1,4 +1,6 @@
+use chrono::prelude::*;
 use rocket::{delete, get, post, serde::json::Json};
+use uuid::Uuid;
 
 use crate::models::*;
 
@@ -6,7 +8,14 @@ use crate::models::*;
 
 #[post("/question", data = "<question>")]
 pub async fn create_question(question: Json<Question>) -> Json<QuestionDetail> {
-    todo!()
+    let qd = QuestionDetail {
+        title: question.title.clone(),
+        description: question.description.clone(),
+        question_uuid: Uuid::new_v4().to_string(),
+        created_at: Utc::now().to_string(),
+    };
+
+    Json(qd)
 }
 
 #[get("/questions")]
