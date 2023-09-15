@@ -1,6 +1,4 @@
-use chrono::prelude::*;
-use rocket::{delete, get, post, serde::json::Json};
-use uuid::Uuid;
+use rocket::serde::json::Json;
 
 use crate::models::*;
 
@@ -8,19 +6,22 @@ use crate::models::*;
 
 #[post("/question", data = "<question>")]
 pub async fn create_question(question: Json<Question>) -> Json<QuestionDetail> {
-    let qd = QuestionDetail {
-        title: question.title.clone(),
-        description: question.description.clone(),
-        question_uuid: Uuid::new_v4().to_string(),
-        created_at: Utc::now().to_string(),
-    };
-
-    Json(qd)
+    Json(QuestionDetail {
+        question_uuid: "question_uuid".to_owned(),
+        title: "title".to_owned(),
+        description: "description".to_owned(),
+        created_at: "created_at".to_owned(),
+    })
 }
 
 #[get("/questions")]
 pub async fn read_questions() -> Json<Vec<QuestionDetail>> {
-    todo!()
+    Json(vec![QuestionDetail {
+        question_uuid: "question_uuid".to_owned(),
+        title: "title".to_owned(),
+        description: "description".to_owned(),
+        created_at: "created_at".to_owned(),
+    }])
 }
 
 #[delete("/question", data = "<question_uuid>")]
@@ -32,19 +33,22 @@ pub async fn delete_question(question_uuid: Json<QuestionId>) {
 
 #[post("/answer", data = "<answer>")]
 pub async fn create_answer(answer: Json<Answer>) -> Json<AnswerDetail> {
-    let answer_delait = AnswerDetail {
-        answer_uuid: Uuid::new_v4().to_string(),
-        question_uuid: answer.question_uuid.clone(),
-        content: answer.content.clone(),
-        created_at: Utc::now().to_string(),
-    };
-
-    Json(answer_delait)
+    Json(AnswerDetail {
+        answer_uuid: "answer_uuid".to_owned(),
+        question_uuid: "question_uuid".to_owned(),
+        content: "content".to_owned(),
+        created_at: "created_at".to_owned(),
+    })
 }
 
-#[get("/answers")]
-pub async fn read_answers() -> Json<Vec<AnswerDetail>> {
-    todo!()
+#[get("/answers", data = "<question_uuid>")]
+pub async fn read_answers(question_uuid: Json<QuestionId>) -> Json<Vec<AnswerDetail>> {
+    Json(vec![AnswerDetail {
+        answer_uuid: "answer_uuid".to_owned(),
+        question_uuid: "question_uuid".to_owned(),
+        content: "content".to_owned(),
+        created_at: "created_at".to_owned(),
+    }])
 }
 
 #[delete("/answer", data = "<answer_uuid>")]
