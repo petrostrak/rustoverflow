@@ -32,7 +32,14 @@ pub async fn delete_question(question_uuid: Json<QuestionId>) {
 
 #[post("/answer", data = "<answer>")]
 pub async fn create_answer(answer: Json<Answer>) -> Json<AnswerDetail> {
-    todo!()
+    let answer_delait = AnswerDetail {
+        answer_uuid: Uuid::new_v4().to_string(),
+        question_uuid: answer.question_uuid.clone(),
+        content: answer.content.clone(),
+        created_at: Utc::now().to_string(),
+    };
+
+    Json(answer_delait)
 }
 
 #[get("/answers")]
