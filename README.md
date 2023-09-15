@@ -17,3 +17,18 @@ In this project, we aim to learn and practice the following:
 *  Writing testable code
 *  Organizing code using modules
 *  Navigating and contributing to an existing code base
+
+First, install `sqlx-cli`. This is SQLx's associated command-line utility for managing databases, migrations, and more:
+```
+cargo install sqlx-cli  
+```
+
+Now you can execute migrations by running:
+```
+sqlx migrate run  
+```
+
+NOTE: If you ever want to revert the migrations, simply run:
+```
+sqlx migrate revert  
+```
