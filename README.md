@@ -23,7 +23,12 @@ First, install `sqlx-cli`. This is SQLx's associated command-line utility for ma
 cargo install sqlx-cli  
 ```
 
-Now you can execute migrations by running:
+Now you can create migrations by running:
+```
+sqlx migrate add <name> -r  
+```
+
+And execute migrations by running:
 ```
 sqlx migrate run  
 ```
