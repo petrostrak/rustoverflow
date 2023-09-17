@@ -1,48 +1,40 @@
 #[macro_use]
 extern crate rocket;
 
+#[macro_use]
+extern crate log;
+
+extern crate pretty_env_logger;
+
+use dotenvy::dotenv;
+
+use persistance::{
+    answers_dao::{AnswersDao, AnswersDaoImpl},
+    questions_dao::{QuestionsDao, QuestionsDaoImpl},
+};
+use sqlx::postgres::PgPoolOptions;
+
 mod cors;
 mod handlers;
 mod models;
-use models::*;
+mod persistance;
 
 use cors::*;
 use handlers::*;
-use log::info;
-use sqlx::{postgres::PgPoolOptions, Row};
 
 #[launch]
 async fn rocket() -> _ {
-    // Initialize pretty_env_logger
     pretty_env_logger::init();
-    // Initialize dotenv
-    dotenvy::dotenv().ok();
-    let db_url = dotenvy::var("DATABASE_URL").expect("could not read 'DATABASE_URL'");
+    dotenv().ok();
 
-    // Create a new PgPoolOptions instance with a maximum of 5 connections.
-    // See examples on GitHub page: https://github.com/launchbadge/sqlx
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect(&db_url)
+        .connect(&std::env::var("DATABASE_URL").expect("DATABASE_URL must be set."))
         .await
-        .expect("could not connect to DB");
+        .expect("Failed to create Postgres connection pool!");
 
-    // Using slqx, execute a SQL query that selects all questions from the questions table.
-    let recs = sqlx::query("SELECT * FROM questions;")
-        .fetch_all(&pool)
-        .await
-        .expect("could not query DB");
-
-    info!("********* Question Records *********");
-    // Log recs with debug formatting using the info! macro
-    let results = recs
-        .iter()
-        .map(|r| Question {
-            description: r.get("description"),
-            title: r.get("title"),
-        })
-        .collect::<Vec<Question>>();
-    results.iter().for_each(|q| info!("{q:?}"));
+    let questions_dao = QuestionsDaoImpl::new(pool.clone());
+    let answers_dao = AnswersDaoImpl::new(pool);
 
     rocket::build()
         .mount(
@@ -57,4 +49,6 @@ async fn rocket() -> _ {
             ],
         )
         .attach(CORS)
+        .manage(Box::new(questions_dao) as Box<dyn QuestionsDao + Send + Sync>)
+        .manage(Box::new(answers_dao) as Box<dyn AnswersDao + Send + Sync>)
 }
