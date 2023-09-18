@@ -65,20 +65,19 @@ impl AnswersDao for AnswersDaoImpl {
     }
 
     async fn delete_answer(&self, answer_uuid: String) -> Result<(), DBError> {
-        // Use the `sqlx::types::Uuid::parse_str` method to parse `answer_uuid` into a `Uuid` type.
-        // parse_str docs: https://docs.rs/sqlx/latest/sqlx/types/struct.Uuid.html#method.parse_str
-        //
-        // If `parse_str` returns an error, map the error to a `DBError::InvalidUUID` error
-        // and early return from this function.
-        let uuid = todo!();
+        let uuid = sqlx::types::Uuid::parse_str(&answer_uuid).map_err(|_| {
+            DBError::InvalidUUID(format!("Could not parse answer UUID: {}", answer_uuid))
+        })?;
 
-        // TODO: Make a database query to delete an answer given the answer uuid.
-        // Here is the SQL query:
-        // ```
-        // DELETE FROM answers WHERE answer_uuid = $1
-        // ```
-        // If executing the query results in an error, map that error
-        // to a `DBError::Other` error and early return from this function.
+        sqlx::query!(
+            r#"
+                DELETE FROM answers WHERE answer_uuid = $1
+            "#,
+            uuid
+        )
+        .execute(&self.db)
+        .await
+        .map_err(|err| DBError::Other(Box::new(err)))?;
 
         Ok(())
     }
