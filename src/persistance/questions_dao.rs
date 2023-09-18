@@ -1,7 +1,5 @@
-use std::error::Error;
-
 use async_trait::async_trait;
-use sqlx::{types::Uuid, PgPool};
+use sqlx::PgPool;
 
 use crate::models::{DBError, Question, QuestionDetail};
 
@@ -66,17 +64,24 @@ impl QuestionsDao for QuestionsDaoImpl {
     }
 
     async fn get_questions(&self) -> Result<Vec<QuestionDetail>, DBError> {
-        // Make a database query to get all questions.
-        // Here is the SQL query:
-        // ```
-        // SELECT * FROM questions
-        // ```
-        // If executing the query results in an error, map that error
-        // to a `DBError::Other` error and early return from this function.
-        let records = todo!();
+        let records = sqlx::query!(
+            r#"
+                SELECT * FROM questions
+            "#
+        )
+        .fetch_all(&self.db)
+        .await
+        .map_err(|err| DBError::Other(Box::new(err)))?;
 
-        // Iterate over `records` and map each record to a `QuestionDetail` type
-        let questions = todo!();
+        let questions = records
+            .into_iter()
+            .map(|rec| QuestionDetail {
+                title: rec.title,
+                description: rec.description,
+                question_uuid: rec.question_uuid.to_string(),
+                created_at: rec.created_at.to_string(),
+            })
+            .collect();
 
         Ok(questions)
     }
