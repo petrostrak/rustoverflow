@@ -83,24 +83,29 @@ impl AnswersDao for AnswersDaoImpl {
     }
 
     async fn get_answers(&self, question_uuid: String) -> Result<Vec<AnswerDetail>, DBError> {
-        // Use the `sqlx::types::Uuid::parse_str` method to parse `question_uuid` into a `Uuid` type.
-        // parse_str docs: https://docs.rs/sqlx/latest/sqlx/types/struct.Uuid.html#method.parse_str
-        //
-        // If `parse_str` returns an error, map the error to a `DBError::InvalidUUID` error
-        // and early return from this function.
-        let uuid = todo!();
+        let uuid = sqlx::types::Uuid::parse_str(&question_uuid).map_err(|_| {
+            DBError::InvalidUUID(format!("Could not parse answer UUID: {}", question_uuid))
+        })?;
 
-        // Make a database query to get all answers associated with a question uuid.
-        // Here is the SQL query:
-        // ```
-        // SELECT * FROM answers WHERE question_uuid = $1
-        // ```
-        // If executing the query results in an error, map that error
-        // to a `DBError::Other` error and early return from this function.
-        let records = todo!();
+        let records = sqlx::query!(
+            r#"
+                SELECT * FROM answers WHERE question_uuid = $1
+            "#,
+            uuid
+        )
+        .fetch_all(&self.db)
+        .await
+        .map_err(|err| DBError::Other(Box::new(err)))?;
 
-        // Iterate over `records` and map each record to a `AnswerDetail` type
-        let answers = todo!();
+        let answers = records
+            .into_iter()
+            .map(|rec| AnswerDetail {
+                content: rec.content,
+                answer_uuid: rec.answer_uuid.to_string(),
+                question_uuid: rec.question_uuid.to_string(),
+                created_at: rec.created_at.to_string(),
+            })
+            .collect();
 
         Ok(answers)
     }
