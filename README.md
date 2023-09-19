@@ -38,4 +38,4 @@ NOTE: If you ever want to revert the migrations, simply run:
 sqlx migrate revert  
 ```
 
-![alt_text](https://github.com/petrostrak/musializer/blob/main/api.gif)
+![Alt Text](https://github.com/petrostrak/rustoverflow/blob/main/api.gif)
