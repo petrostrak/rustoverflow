@@ -49,6 +49,8 @@ async fn rocket() -> _ {
             ],
         )
         .attach(CORS)
+        // The manage method allows us to add state to the state managed by this instance of Rocket.
+        // Then we can use this state in the handlers.
         .manage(Box::new(questions_dao) as Box<dyn QuestionsDao + Send + Sync>)
         .manage(Box::new(answers_dao) as Box<dyn AnswersDao + Send + Sync>)
 }
