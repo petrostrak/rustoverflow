@@ -72,16 +72,16 @@ pub async fn create_answer(
     answer: Answer,
     answers_dao: &Box<dyn AnswersDao + Send + Sync>,
 ) -> Result<AnswerDetail, HandlerError> {
-    let answer = todo!(); // create answer using `answers_dao`
+    let answer = answers_dao.create_answer(answer).await;
 
     match answer {
-        Ok(answer) => todo!(), // return answer
+        Ok(answer) => Ok(answer),
         Err(err) => {
-            // TODO: log err using error! macro
+            error!("{:?}", err);
 
             match err {
-                DBError::InvalidUUID(s) => todo!(), // return a `HandlerError::BadRequest` error passing in s as the string
-                _ => todo!(), // return a default internal error using the HandlerError type
+                DBError::InvalidUUID(s) => Err(HandlerError::BadRequest(s)),
+                _ => Err(HandlerError::default_internal_error()),
             }
         }
     }
