@@ -57,10 +57,12 @@ pub async fn delete_question(
     question_uuid: QuestionId,
     questions_dao: &Box<dyn QuestionsDao + Sync + Send>,
 ) -> Result<(), HandlerError> {
-    let result = todo!(); // delete question using `questions_dao`
+    let result = questions_dao
+        .delete_question(question_uuid.question_uuid)
+        .await;
 
     if result.is_err() {
-        return todo!(); // return a default internal error using the HandlerError type
+        return Err(HandlerError::default_internal_error());
     }
 
     Ok(())
