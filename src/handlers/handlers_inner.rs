@@ -91,13 +91,13 @@ pub async fn read_answers(
     question_uuid: QuestionId,
     answers_dao: &Box<dyn AnswersDao + Send + Sync>,
 ) -> Result<Vec<AnswerDetail>, HandlerError> {
-    let answers = todo!(); // get answers using `answers_dao`
+    let answers = answers_dao.get_answers(question_uuid.question_uuid).await;
 
     match answers {
-        Ok(answers) => todo!(), // return answers
+        Ok(answers) => Ok(answers), // return answers
         Err(e) => {
-            // TODO: log err using error! macro
-            todo!() // return a default internal error using the HandlerError type
+            error!("{:?}", e);
+            Err(HandlerError::default_internal_error())
         }
     }
 }
