@@ -23,7 +23,7 @@ pub async fn create_question(
     // We are using a trait object here so that inner handlers do not depend on concrete DAO implementations
     questions_dao: &Box<dyn QuestionsDao + Sync + Send>,
 ) -> Result<QuestionDetail, HandlerError> {
-    let question = questions_dao.create_question(question).await; // create question using `questions_dao`
+    let question = questions_dao.create_question(question).await;
 
     match question {
         Ok(question) => Ok(QuestionDetail {
@@ -42,13 +42,13 @@ pub async fn create_question(
 pub async fn read_questions(
     questions_dao: &Box<dyn QuestionsDao + Sync + Send>,
 ) -> Result<Vec<QuestionDetail>, HandlerError> {
-    let questions = todo!(); // get questions using `questions_dao`
+    let questions = questions_dao.get_questions().await;
 
     match questions {
-        Ok(questions) => todo!(), // return questions
+        Ok(questions) => Ok(questions),
         Err(err) => {
-            // TODO: log err using error! macro
-            todo!() // return a default internal error using the HandlerError type
+            error!("{:?}", err);
+            Err(HandlerError::default_internal_error())
         }
     }
 }
